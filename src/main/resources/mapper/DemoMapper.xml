@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bugull.locker.mapper.DemoMapper">
+    <resultMap id="BaseResultMap" type="com.bugull.locker.entity.Demo">
+        <id property="id" javaType="string" column="id" />
+        <result javaType="string" column="demo" property="demo" />
+        <result column="createUser" jdbcType="VARCHAR" property="createUser"/>
+        <result column="createDate" jdbcType="DATE" property="createDate" javaType="java.sql.Timestamp"/>
+        <result column="modifyUser" jdbcType="VARCHAR" property="modifyUser"/>
+        <result column="modifyDate" jdbcType="DATE" property="modifyDate" javaType="java.sql.Timestamp"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <sql id = "Base_Column_List">
+        `id`, `demo`, `createUser`, `createDate`, `modifyUser`, `modifyDate`, `status`, `version`, `remark`
+    </sql>
+
+    <select id="queryDemo" resultType="com.bugull.locker.entity.Demo">
+        select <include refid="Base_Column_List"/>
+        from sys_demo
+    </select>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_demo WHERE  `id` = #{id} and `status` > -1
+    </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_demo WHERE `status` >= -1 AND `id` IN
+        <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.String">
+        UPDATE sys_demo SET `status` = -1, `version` = `version` + 1 WHERE `id` = #{id}
+    </update>
+
+    <update id="deleteByIds">
+        UPDATE sys_demo SET `status` = -1, `version` = `version` + 1 WHERE `id` IN
+        <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="insertEntity" parameterType="com.bugull.locker.entity.Demo">
+        INSERT INTO sys_demo (`id`, `demo`, `createUser`, `createDate`, `modifyUser`,
+        `modifyDate`, `status`, `version`, `remark`
+        )
+        VALUES
+        (#{id,jdbcType=VARCHAR}, #{demo,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, NOW(),
+        #{modifyUser,jdbcType=VARCHAR}, NOW(), 1, 1, #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateEntity" parameterType="com.bugull.locker.entity.Demo">
+        update sys_demo
+        <set>
+            <if test="demo != null &amp; demo != '' ">
+                `demo` = #{demo,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyUser != null &amp; modifyUser != '' ">
+                `modifyUser` = #{modifyUser,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null &amp; remark != '' ">
+                `remark` = #{remark,jdbcType=VARCHAR},
+            </if>
+            `modifyDate` = NOW(),
+            `version` = `version` + 1
+        </set>
+        where `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectPageByMap" resultMap="BaseResultMap" >
+        SELECT <include refid="Base_Column_List"/>
+        FROM sys_demo
+        <where>
+            <if test="demo != null &amp; demo != ''">
+                AND `demo` like CONCAT('%', #{demo}, '%')
+            </if>
+            <if test="startTime != null and createDate != ''">
+                AND date_format(`createDate`, '%Y-%m-%d %H:%i:%S') >= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND date_format(`createDate`, '%Y-%m-%d %H:%i:%S') <![CDATA[ <=  ]]> concat(#{endTime}, 'z')
+            </if>
+            AND `status` > -1
+        </where>
+        order by `createDate` desc
+    </select>
+
+
+</mapper>

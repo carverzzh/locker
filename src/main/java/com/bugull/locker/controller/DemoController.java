@@ -1,11 +1,14 @@
 package com.bugull.locker.controller;
 
+import com.bugull.locker.entity.Demo;
 import com.bugull.locker.response.ApiResult;
 import com.bugull.locker.service.DemoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @program: locker
@@ -23,5 +26,10 @@ public class DemoController {
     @RequestMapping(value = "/demo")
     public ApiResult<String> HelloWorld() {
         return ApiResult.success(demoService.strDemo());
+    }
+
+    @RequestMapping(value = "/queryDemo")
+    public ApiResult<List<Demo>> queryDemo() {
+        return ApiResult.success(demoService.queryDemo());
     }
 }
