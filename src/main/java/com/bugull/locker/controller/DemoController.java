@@ -1,6 +1,9 @@
 package com.bugull.locker.controller;
 
+import com.bugull.locker.response.ApiResult;
+import com.bugull.locker.service.DemoService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,8 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DemoController {
 
+    @Autowired
+    private DemoService demoService;
+
     @RequestMapping(value = "/demo")
-    public String HelloWorld() {
-        return "Hello World";
+    public ApiResult<String> HelloWorld() {
+        return ApiResult.success(demoService.strDemo());
     }
 }
