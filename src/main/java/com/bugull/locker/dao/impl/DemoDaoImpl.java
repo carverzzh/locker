@@ -18,10 +18,17 @@ import java.util.Map;
  * @create: 2019-06-05 14:45
  **/
 @Service
-public class DemoDaoImpl implements DemoDao {
+public class DemoDaoImpl extends BaseDAOImpl implements DemoDao {
 
-    @Resource
-    private DemoMapper demoMapper;
+    @Override
+    public Class<?> getEntityClass() {
+        return Demo.class;
+    }
+
+    @Override
+    public Class<?> getMapperClass() {
+        return DemoMapper.class;
+    }
 
     @Override
     public String strDemo() {
@@ -30,41 +37,7 @@ public class DemoDaoImpl implements DemoDao {
 
     @Override
     public List<Demo> queryDemo() {
-        return demoMapper.queryDemo();
-    }
-
-    @Override
-    public BaseEntity selectById(String id) {
-        return null;
-    }
-
-    @Override
-    public List<BaseEntity> selectByIds(List<String> ids) {
-        return null;
-    }
-
-    @Override
-    public void deleteById(String id) {
-
-    }
-
-    @Override
-    public void deleteByIds(List<String> ids) {
-
-    }
-
-    @Override
-    public void insertEntity(BaseEntity entity) {
-
-    }
-
-    @Override
-    public void updateEntity(BaseEntity entity) {
-
-    }
-
-    @Override
-    public List<BaseEntity> selectPageByMap(Map<String, Object> map, int pageNum, int pageSize) {
-        return null;
+        DemoMapper mapper = (DemoMapper) sqlSession.getMapper(this.getMapperClass());
+        return mapper.queryDemo();
     }
 }

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bugull.locker.mapper.FactoryMapper">
+    <resultMap id="BaseResultMap" type="com.bugull.locker.entity.FactoryEntity">
+        <id property="id" javaType="string" column="id" />
+        <result column="factoryName" jdbcType="VARCHAR" property="factoryName" />
+        <result column="factoryCode" jdbcType="VARCHAR" property="factoryCode" />
+        <result column="manager" jdbcType="VARCHAR" property="manager" />
+        <result column="createUser" jdbcType="VARCHAR" property="createUser"/>
+        <result column="createDate" jdbcType="DATE" property="createDate" javaType="java.sql.Timestamp"/>
+        <result column="modifyUser" jdbcType="VARCHAR" property="modifyUser"/>
+        <result column="modifyDate" jdbcType="DATE" property="modifyDate" javaType="java.sql.Timestamp"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <sql id = "Base_Column_List">
+        `id`, `factoryName`, `factoryCode`, `manager`,
+        `createUser`, `createDate`, `modifyUser`, `modifyDate`, `status`, `version`, `remark`
+    </sql>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `sys_factory` WHERE  `id` = #{id} and `status` > -1
+    </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `sys_factory` WHERE `status` >= -1 AND `id` IN
+        <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.String">
+        UPDATE `sys_factory` SET `status` = -1, `version` = `version` + 1 WHERE `id` = #{id}
+    </update>
+
+    <update id="deleteByIds">
+        UPDATE `sys_factory` SET `status` = -1, `version` = `version` + 1 WHERE `id` IN
+        <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="insertEntity" parameterType="com.bugull.locker.entity.FactoryEntity">
+        INSERT INTO `sys_factory` (`id`, `factoryName`, `factoryCode`, `manager`,
+        `createUser`, `createDate`, `modifyUser`, `modifyDate`, `status`, `version`, `remark`
+        )
+        VALUES
+        (#{id,jdbcType=VARCHAR}, #{factoryName,jdbcType=VARCHAR}, #{factoryCode,jdbcType=VARCHAR}, #{manager,jdbcType=VARCHAR},
+        #{createUser,jdbcType=VARCHAR}, NOW(), #{modifyUser,jdbcType=VARCHAR}, NOW(), 1, 1, #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateEntity" parameterType="com.bugull.locker.entity.FactoryEntity">
+        update `sys_factory`
+        <set>
+            <if test="factoryName != null &amp; factoryName != '' ">
+                `factoryName` = #{factoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="factoryCode != null &amp; factoryCode != '' ">
+                `factoryCode` = #{factoryCode,jdbcType=VARCHAR},
+            </if>
+            <if test="manager != null &amp; manager != '' ">
+                `manager` = #{manager,jdbcType=VARCHAR},
+            </if>
+            `modifyUser` = #{modifyUser,jdbcType=VARCHAR},
+            `modifyDate` = NOW(),
+            `version` = `version` + 1
+        </set>
+        where `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectPageByMap" resultMap="BaseResultMap" >
+        select <include refid="Base_Column_List"/> from `sys_factory`
+        <where>
+            `status` > -1
+            <if test="factoryName != null and factoryName != ''">
+                and `factoryName` like CONCAT('%', #{factoryName}, '%')
+            </if>
+            <if test="factoryCode != null and factoryCode != ''">
+                and `factoryCode` like CONCAT('%', #{factoryCode}, '%')
+            </if>
+        </where>
+        order by `createDate` desc
+    </select>
+
+    <update id="deleteByUser" parameterType="java.lang.String">
+        UPDATE `sys_factory` SET `status` = -1, `version` = `version` + 1
+          `modifyUser` = #{userId}, `modifyDate` = NOW()
+        WHERE `id` = #{id}
+    </update>
+
+    <select id="checkFacExist" resultType="java.lang.Integer">
+        select 1 from `sys_factory`
+        <where>
+            `status` > -1
+            <if test="factoryName != null and factoryName != ''">
+                and `factoryName` = #{factoryName}
+            </if>
+            <if test="factoryCode != null and factoryCode != ''">
+                and `factoryCode` = #{factoryCode}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+
+</mapper>
