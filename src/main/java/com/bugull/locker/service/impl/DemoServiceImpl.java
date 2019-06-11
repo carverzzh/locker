@@ -1,5 +1,6 @@
 package com.bugull.locker.service.impl;
 
+import com.bugull.locker.dao.BaseDAO;
 import com.bugull.locker.dao.DemoDao;
 import com.bugull.locker.entity.BaseEntity;
 import com.bugull.locker.entity.Demo;
@@ -17,10 +18,20 @@ import java.util.Map;
  * @create: 2019-06-05 13:31
  **/
 @Service
-public class DemoServiceImpl implements DemoService{
+public class DemoServiceImpl extends BaseServiceImpl implements DemoService{
 
     @Autowired
     private DemoDao demoDao;
+
+    @Override
+    public Class<?> getEntityClass() {
+        return Demo.class;
+    }
+
+    @Override
+    protected BaseDAO getBaseDao() {
+        return demoDao;
+    }
 
     @Override
     public String strDemo() {
@@ -30,40 +41,5 @@ public class DemoServiceImpl implements DemoService{
     @Override
     public List<Demo> queryDemo() {
         return demoDao.queryDemo();
-    }
-
-    @Override
-    public BaseEntity selectById(String id) {
-        return null;
-    }
-
-    @Override
-    public List<BaseEntity> selectByIds(List<String> ids) {
-        return null;
-    }
-
-    @Override
-    public void deleteById(String id) {
-
-    }
-
-    @Override
-    public void deleteByIds(List<String> ids) {
-
-    }
-
-    @Override
-    public void insertEntity(BaseEntity entity) {
-
-    }
-
-    @Override
-    public void updateEntity(BaseEntity entity) {
-
-    }
-
-    @Override
-    public List<BaseEntity> selectPageByMap(Map<String, Object> map, int pageNum, int pageSize) {
-        return null;
     }
 }

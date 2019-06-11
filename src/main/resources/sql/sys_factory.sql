@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50051
 File Encoding         : 65001
 
-Date: 2019-06-10 17:29:40
+Date: 2019-06-11 14:34:59
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -24,9 +24,13 @@ CREATE TABLE `sys_factory` (
   `factoryName` varchar(50) default NULL,
   `factoryCode` varchar(50) default NULL,
   `manager` varchar(50) default NULL,
-  `createtime` datetime default NULL,
-  `updatetime` datetime default NULL,
+  `createUser` varchar(50) default NULL,
+  `createDate` datetime default NULL,
+  `modifyUser` varchar(50) default NULL,
+  `modifyDate` datetime default NULL,
+  `version` int(11) default NULL,
   `status` int(11) default NULL,
+  `remark` varchar(50) default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

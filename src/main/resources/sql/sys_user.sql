@@ -26,9 +26,13 @@ CREATE TABLE `sys_user` (
   `password` varchar(50) default NULL,
   `phone` varchar(50) default NULL,
   `email` varchar(50) default NULL,
-  `createtime` datetime default NULL,
-  `updatetime` datetime default NULL,
+  `createUser` varchar(50) default NULL,
+  `createDate` datetime default NULL,
+  `modifyUser` varchar(50) default NULL,
+  `modifyDate` datetime default NULL,
+  `version` int(11) default NULL,
   `status` int(11) default NULL,
+  `remark` varchar(50) default NULL,
   `parentId` varchar(50) default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -1,5 +1,8 @@
 package com.bugull.locker.response;
 
+import com.bugull.locker.response.apierror.ApiError;
+import com.bugull.locker.response.apierror.errors.common.COMMON;
+
 import java.io.Serializable;
 
 /**
@@ -79,6 +82,42 @@ public class ApiResult<T> implements Serializable {
     public static ApiResult error() {
         ApiResult result = new ApiResult();
         result.setCode(ERROR);
+        return result;
+    }
+
+    public static ApiResult error(String msg){
+        ApiResult result = new ApiResult();
+        result.setCode(ERROR);
+        result.setErrorMsg(msg);
+        return result;
+    }
+
+    public static ApiResult error(ApiError error){
+        ApiResult result = new ApiResult();
+        result.setCode(ERROR);
+        result.setErrorMsg(error.getErrorMessage());
+        result.setErrorCode(error.getErrorCode());
+        return result;
+    }
+
+    public static ApiResult SYS_BUSY(){
+        ApiResult result = new ApiResult();
+        result.setCode(ERROR);
+        result.setErrorMsg(COMMON.SYS_BUSY.getErrorMessage());
+        result.setErrorCode(COMMON.SYS_BUSY.getErrorCode());
+        return result;
+    }
+
+    public static ApiResult PARAM_ILL(){
+        ApiResult result = new ApiResult();
+        result.setCode(ERROR);
+        result.setErrorMsg(COMMON.PARAM_ILL.getErrorMessage());
+        result.setErrorCode(COMMON.PARAM_ILL.getErrorCode());
+        return result;
+    }
+    public static ApiResult success(){
+        ApiResult result = new ApiResult();
+        result.setCode(SUCCESS);
         return result;
     }
 
