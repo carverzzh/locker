@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bugull.locker.mapper.MenuMapper">
+    <resultMap id="BaseResultMap" type="com.bugull.locker.entity.MenuEntity">
+        <id property="id" javaType="string" column="id" />
+        <result column="menuName" jdbcType="VARCHAR" property="menuName" />
+        <result column="menuCode" jdbcType="VARCHAR" property="menuCode" />
+        <result column="menuUrl" jdbcType="VARCHAR" property="menuUrl" />
+        <result column="parentId" jdbcType="VARCHAR" property="parentId" />
+        <result column="sequence" jdbcType="INTEGER" property="sequence"/>
+        <result column="level" jdbcType="INTEGER" property="level"/>
+        <result column="createUser" jdbcType="VARCHAR" property="createUser"/>
+        <result column="createDate" jdbcType="DATE" property="createDate" javaType="java.sql.Timestamp"/>
+        <result column="modifyUser" jdbcType="VARCHAR" property="modifyUser"/>
+        <result column="modifyDate" jdbcType="DATE" property="modifyDate" javaType="java.sql.Timestamp"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <resultMap id="MenuFuncTreeResultMap" type="com.bugull.locker.vo.MenuFunctionTreeVO">
+        <id column="menuId" jdbcType="VARCHAR" property="menuId" />
+        <result column="menuName" jdbcType="VARCHAR" property="menuName" />
+        <result column="menuUrl" jdbcType="VARCHAR" property="menuUrl" />
+        <result column="parentId" jdbcType="VARCHAR" property="parentId" />
+        <result column="sequence" jdbcType="INTEGER" property="sequence" />
+        <result column="level" jdbcType="INTEGER" property="level" />
+        <collection property="funTrees" ofType="com.bugull.locker.vo.FunctionTreeVO" column="func_menu_id">
+            <id column="funId" property="funId" />
+            <result column="funName" property="funName" />
+            <result column="funUrl" property="funUrl" />
+        </collection>
+    </resultMap>
+
+    <sql id = "Base_Column_List">
+        `id`, `menuName`, `menuCode`, `menuUrl`, `parentId`, `sequence`, `level`,
+        `createUser`, `createDate`, `modifyUser`, `modifyDate`, `status`, `version`, `remark`
+    </sql>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `sys_menu` WHERE  `id` = #{id} and `status` > -1
+    </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `sys_menu` WHERE `status` >= -1 AND `id` IN
+        <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.String">
+        UPDATE `sys_menu` SET `status` = -1, `version` = `version` + 1 WHERE `id` = #{id}
+    </update>
+
+    <update id="deleteByIds">
+        UPDATE `sys_menu` SET `status` = -1, `version` = `version` + 1 WHERE `id` IN
+        <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="insertEntity" parameterType="com.bugull.locker.entity.MenuEntity">
+        INSERT INTO `sys_menu` (`id`, `menuName`, `menuCode`, `menuUrl`, `parentId`, `sequence`, `level`,
+        `createUser`, `createDate`, `modifyUser`, `modifyDate`, `status`, `version`, `remark`
+        )
+        VALUES
+        (#{id,jdbcType=VARCHAR}, #{menuName,jdbcType=VARCHAR}, #{menuCode,jdbcType=VARCHAR}, #{menuUrl,jdbcType=VARCHAR},
+        #{parentId,jdbcType=VARCHAR}, #{sequence,jdbcType=INTEGER}, #{level,jdbcType=INTEGER},
+        #{createUser,jdbcType=VARCHAR}, NOW(), #{modifyUser,jdbcType=VARCHAR}, NOW(), 1, 1, #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateEntity" parameterType="com.bugull.locker.entity.MenuEntity">
+        update `sys_menu`
+        <set>
+            <if test="menuName != null &amp; menuName != '' ">
+                `menuName` = #{menuName,jdbcType=VARCHAR},
+            </if>
+            <if test="menuCode != null &amp; menuCode != '' ">
+                `menuCode` = #{menuCode,jdbcType=VARCHAR},
+            </if>
+            <if test="menuUrl != null &amp; menuUrl != '' ">
+                `menuUrl` = #{menuUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="parentId != null &amp; parentId != '' ">
+                `parentId` = #{parentId,jdbcType=VARCHAR},
+            </if>
+            <if test="sequence != null ">
+                `sequence` = #{sequence,jdbcType=INTEGER},
+            </if>
+            <if test="level != null ">
+                `level` = #{level,jdbcType=INTEGER},
+            </if>
+            `modifyUser` = #{modifyUser,jdbcType=VARCHAR},
+            `modifyDate` = NOW(),
+            `version` = `version` + 1
+        </set>
+        where `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectPageByMap" resultMap="BaseResultMap" >
+        select <include refid="Base_Column_List"/> from `sys_menu`
+        <where>
+            `status` > -1 and `level` > 0
+            <if test="menuName != null and menuName != ''">
+                and `menuName` = #{menuName}
+            </if>
+            <if test="menuCode != null and menuCode != ''">
+                and `menuCode` = #{menuCode}
+            </if>
+        </where>
+        order by `createDate` desc
+    </select>
+
+    <update id="deleteByUser" parameterType="java.lang.String">
+        UPDATE `sys_menu` SET `status` = -1, `version` = `version` + 1
+        `modifyUser` = #{userId}, `modifyDate` = NOW()
+        WHERE `id` = #{id}
+    </update>
+
+    <select id="checkMenuExist" resultType="java.lang.Integer">
+        select 1 from `sys_menu`
+        <where>
+            `status` > -1
+            <if test="menuName != null and menuName != ''">
+                and `menuName` = #{menuName}
+            </if>
+            <if test="menuCode != null and menuCode != ''">
+                and `menuCode` = #{menuCode}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+    <select id="getMenuFunTree" resultMap="MenuFuncTreeResultMap" >
+        select menu.`id` as menuId, menu.`menuName` as menuName, menu.`menuUrl` as menuUrl, menu.`parentId` as parentId, menu.`level` as level, menu.`sequence` as sequence,
+        fun.`menuId` as func_menu_id, fun.`id` as funId, fun.`functionName` as funName, fun.`functionUrl` as funUrl
+        from sys_menu menu
+        LEFT JOIN sys_function fun on (menu.`id` = fun.`menuId` and fun.`status` = 1)
+        where menu.`status` = 1 and menu.`level` > 0
+    </select>
+
+
+</mapper>

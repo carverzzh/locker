@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bugull.locker.mapper.FunctionMapper">
+    <resultMap id="BaseResultMap" type="com.bugull.locker.entity.FunctionEntity">
+        <id property="id" javaType="string" column="id" />
+        <result column="functionName" jdbcType="VARCHAR" property="functionName" />
+        <result column="functionCode" jdbcType="VARCHAR" property="functionCode" />
+        <result column="functionUrl" jdbcType="VARCHAR" property="functionUrl" />
+        <result column="menuId" jdbcType="VARCHAR" property="menuId" />
+        <result column="createUser" jdbcType="VARCHAR" property="createUser"/>
+        <result column="createDate" jdbcType="DATE" property="createDate" javaType="java.sql.Timestamp"/>
+        <result column="modifyUser" jdbcType="VARCHAR" property="modifyUser"/>
+        <result column="modifyDate" jdbcType="DATE" property="modifyDate" javaType="java.sql.Timestamp"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <resultMap id="FunctionVOResultMap" type="com.bugull.locker.vo.FunctionVO">
+        <id property="id" javaType="string" column="id" />
+        <result column="functionName" jdbcType="VARCHAR" property="functionName" />
+        <result column="functionCode" jdbcType="VARCHAR" property="functionCode" />
+        <result column="functionUrl" jdbcType="VARCHAR" property="functionUrl" />
+        <result column="menuId" jdbcType="VARCHAR" property="menuId" />
+        <result column="createUser" jdbcType="VARCHAR" property="createUser"/>
+        <result column="createDate" jdbcType="DATE" property="createDate" javaType="java.sql.Timestamp"/>
+        <result column="modifyUser" jdbcType="VARCHAR" property="modifyUser"/>
+        <result column="modifyDate" jdbcType="DATE" property="modifyDate" javaType="java.sql.Timestamp"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+
+        <result column="menuName" jdbcType="VARCHAR" property="menuName" />
+        <result column="menuCode" jdbcType="VARCHAR" property="menuCode" />
+    </resultMap>
+
+    <sql id = "Base_Column_List">
+        `id`, `functionName`, `functionCode`, `functionUrl`, `menuId`,
+        `createUser`, `createDate`, `modifyUser`, `modifyDate`, `status`, `version`, `remark`
+    </sql>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `sys_function` WHERE  `id` = #{id} and `status` > -1
+    </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `sys_function` WHERE `status` >= -1 AND `id` IN
+        <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.String">
+        UPDATE `sys_function` SET `status` = -1, `version` = `version` + 1 WHERE `id` = #{id}
+    </update>
+
+    <update id="deleteByIds">
+        UPDATE `sys_function` SET `status` = -1, `version` = `version` + 1 WHERE `id` IN
+        <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="insertEntity" parameterType="com.bugull.locker.entity.FunctionEntity">
+        INSERT INTO `sys_function` (`id`, `functionName`, `functionCode`, `functionUrl`, `menuId`,
+        `createUser`, `createDate`, `modifyUser`, `modifyDate`, `status`, `version`, `remark`
+        )
+        VALUES
+        (#{id,jdbcType=VARCHAR}, #{functionName,jdbcType=VARCHAR}, #{functionCode,jdbcType=VARCHAR}, #{functionUrl,jdbcType=VARCHAR},
+        #{menuId,jdbcType=VARCHAR},
+        #{createUser,jdbcType=VARCHAR}, NOW(), #{modifyUser,jdbcType=VARCHAR}, NOW(), 1, 1, #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateEntity" parameterType="com.bugull.locker.entity.FunctionEntity">
+        update `sys_function`
+        <set>
+            <if test="functionName != null &amp; functionName != '' ">
+                `menuName` = #{menuName,jdbcType=VARCHAR},
+            </if>
+            <if test="functionCode != null &amp; functionCode != '' ">
+                `functionCode` = #{functionCode,jdbcType=VARCHAR},
+            </if>
+            <if test="functionUrl != null &amp; functionUrl != '' ">
+                `functionUrl` = #{functionUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="menuId != null &amp; menuId != '' ">
+                `menuId` = #{menuId,jdbcType=VARCHAR},
+            </if>
+            `modifyUser` = #{modifyUser,jdbcType=VARCHAR},
+            `modifyDate` = NOW(),
+            `version` = `version` + 1
+        </set>
+        where `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectPageByMap" resultMap="FunctionVOResultMap" >
+        select sf.`id`, sf.`functionName`, sf.`functionCode`, sf.`functionUrl`, sf.`menuId`,
+        sf.`createUser`, sf.`createDate`, sf.`modifyUser`, sf.`modifyDate`, sf.`status`, sf.`version`, sf.`remark`,
+        sm.`menuName`, sm.`menuCode`
+        from `sys_function` sf
+        left join `sys_menu` sm on (sm.`id` = sf.`menuId` and sm.`status` > -1)
+        <where>
+            sf.`status` > -1
+            <if test="functionName != null and functionName != ''">
+                and sf.`functionName` = #{functionName}
+            </if>
+            <if test="functionCode != null and functionCode != ''">
+                and sf.`functionCode` = #{functionCode}
+            </if>
+            <if test="menuName != null and menuName != ''">
+                and sm.`menuName` = #{menuName}
+            </if>
+        </where>
+        order by sf.`createDate` desc
+    </select>
+
+    <update id="deleteByUser" parameterType="java.lang.String">
+        UPDATE `sys_function` SET `status` = -1, `version` = `version` + 1
+        `modifyUser` = #{userId}, `modifyDate` = NOW()
+        WHERE `id` = #{id}
+    </update>
+
+    <select id="checkFunctionExist" resultType="java.lang.Integer">
+        select 1 from `sys_function`
+        <where>
+            `status` > -1
+            and `menuId` = #{menuId}
+            <if test="menuName != null and menuName != ''">
+                and `menuName` = #{menuName}
+            </if>
+            <if test="menuCode != null and menuCode != ''">
+                and `menuCode` = #{menuCode}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+
+</mapper>
