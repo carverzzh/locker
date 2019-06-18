@@ -96,4 +96,13 @@ public class MenuController {
     public ApiResult<List<MenuFunctionTreeVO>> getMenuFunTree() {
         return ApiResult.success(menuService.getMenuFunTree());
     }
+
+    @ApiOperation(value = "getMenuById", notes = "获取菜单详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "菜单id", required = false, paramType = "query", dataType = "String")
+    })
+    @RequestMapping(value = "/getMenuById", method = RequestMethod.GET)
+    public ApiResult<MenuFunctionTreeVO> getMenuById(@RequestParam(required = false) String id) {
+        return ApiResult.success(menuService.getMenuById(id));
+    }
 }

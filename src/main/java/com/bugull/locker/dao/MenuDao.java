@@ -12,4 +12,6 @@ public interface MenuDao extends BaseDAO {
     public boolean checkMenuExist(String menuName, String menuCode);
 
     public List<MenuFunctionTreeVO> getMenuFunTree();
+
+    public MenuFunctionTreeVO getMenuById(String id);
 }

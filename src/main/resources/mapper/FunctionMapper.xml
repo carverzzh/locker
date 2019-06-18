@@ -43,7 +43,7 @@
     <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM `sys_function` WHERE  `id` = #{id} and `status` > -1
+        FROM `sys_function` WHERE  `id` = #{id} AND `status` > -1
     </select>
 
     <select id="selectByIds" resultMap="BaseResultMap">
@@ -77,7 +77,7 @@
     </insert>
 
     <update id="updateEntity" parameterType="com.bugull.locker.entity.FunctionEntity">
-        update `sys_function`
+        UPDATE `sys_function`
         <set>
             <if test="functionName != null &amp; functionName != '' ">
                 `menuName` = #{menuName,jdbcType=VARCHAR},
@@ -95,28 +95,28 @@
             `modifyDate` = NOW(),
             `version` = `version` + 1
         </set>
-        where `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
+        WHERE `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
     </update>
 
     <select id="selectPageByMap" resultMap="FunctionVOResultMap" >
-        select sf.`id`, sf.`functionName`, sf.`functionCode`, sf.`functionUrl`, sf.`menuId`,
+        SELECT sf.`id`, sf.`functionName`, sf.`functionCode`, sf.`functionUrl`, sf.`menuId`,
         sf.`createUser`, sf.`createDate`, sf.`modifyUser`, sf.`modifyDate`, sf.`status`, sf.`version`, sf.`remark`,
         sm.`menuName`, sm.`menuCode`
-        from `sys_function` sf
-        left join `sys_menu` sm on (sm.`id` = sf.`menuId` and sm.`status` > -1)
+        FROM `sys_function` sf
+        LEFT JOIN `sys_menu` sm ON (sm.`id` = sf.`menuId` AND sm.`status` > -1)
         <where>
             sf.`status` > -1
             <if test="functionName != null and functionName != ''">
-                and sf.`functionName` = #{functionName}
+                AND sf.`functionName` = #{functionName}
             </if>
             <if test="functionCode != null and functionCode != ''">
-                and sf.`functionCode` = #{functionCode}
+                AND sf.`functionCode` = #{functionCode}
             </if>
             <if test="menuName != null and menuName != ''">
-                and sm.`menuName` = #{menuName}
+                AND sm.`menuName` = #{menuName}
             </if>
         </where>
-        order by sf.`createDate` desc
+        ORDER BY sf.`createDate` DESC
     </select>
 
     <update id="deleteByUser" parameterType="java.lang.String">
@@ -126,18 +126,18 @@
     </update>
 
     <select id="checkFunctionExist" resultType="java.lang.Integer">
-        select 1 from `sys_function`
+        SELECT 1 FROM `sys_function`
         <where>
             `status` > -1
-            and `menuId` = #{menuId}
+            AND `menuId` = #{menuId}
             <if test="menuName != null and menuName != ''">
-                and `menuName` = #{menuName}
+                AND `menuName` = #{menuName}
             </if>
             <if test="menuCode != null and menuCode != ''">
-                and `menuCode` = #{menuCode}
+                AND `menuCode` = #{menuCode}
             </if>
         </where>
-        limit 1
+        LIMIT 1
     </select>
 
 

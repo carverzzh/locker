@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bugull.locker.mapper.RoleFunctionMapper">
+    <resultMap id="BaseResultMap" type="com.bugull.locker.entity.RoleFunctionEntity">
+        <id property="id" javaType="string" column="id" />
+        <result column="functionId" jdbcType="VARCHAR" property="functionId" />
+        <result column="roleMenuId" jdbcType="VARCHAR" property="roleMenuId" />
+    </resultMap>
+
+    <sql id = "Base_Column_list">
+        `id`, `functionId`, `roleMenuId`
+    </sql>
+
+    <insert id = "insert" parameterType="com.bugull.locker.entity.UserRoleEntity">
+        INSERT INTO `sys_rolefunction` (`id`, `functionId`, `roleMenuId`)
+        VALUES
+        (#{id,jdbcType=VARCHAR}, #{functionId,jdbcType=VARCHAR}, #{roleMenuId,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="delete" parameterType="string">
+        DELETE FROM `sys_rolefunction` WHERE `roleMenuId` in (
+        SELECT `id` FROM `sys_rolemenu` WHERE `roleId` = #{roleId,jdbcType=VARCHAR}
+        )
+    </delete>
+
+    <insert id = "insertBatch" parameterType="java.util.List" useGeneratedKeys="false">
+        INSERT INTO `sys_rolefunction` (`id`, `functionId`, `roleMenuId`)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.functionId,jdbcType=VARCHAR},
+            #{item.roleMenuId,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectByRoleMenuId" parameterType="string" resultMap="BaseResultMap" >
+        SELECT <include refid="Base_Column_list"/> FROM `sys_rolefunction`
+        WHERE `roleMenuId` = #{roleMenuId,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

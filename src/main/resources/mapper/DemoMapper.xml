@@ -19,14 +19,14 @@
     </sql>
 
     <select id="queryDemo" resultType="com.bugull.locker.entity.Demo">
-        select <include refid="Base_Column_List"/>
-        from sys_demo
+        SELECT <include refid="Base_Column_List"/>
+        FROM sys_demo
     </select>
 
     <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM sys_demo WHERE  `id` = #{id} and `status` > -1
+        FROM sys_demo WHERE  `id` = #{id} AND `status` > -1
     </select>
 
     <select id="selectByIds" resultMap="BaseResultMap">
@@ -59,7 +59,7 @@
     </insert>
 
     <update id="updateEntity" parameterType="com.bugull.locker.entity.Demo">
-        update sys_demo
+        UPDATE sys_demo
         <set>
             <if test="demo != null &amp; demo != '' ">
                 `demo` = #{demo,jdbcType=VARCHAR},
@@ -73,7 +73,7 @@
             `modifyDate` = NOW(),
             `version` = `version` + 1
         </set>
-        where `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
+        WHERE `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
     </update>
 
     <select id="selectPageByMap" resultMap="BaseResultMap" >
@@ -81,7 +81,7 @@
         FROM sys_demo
         <where>
             <if test="demo != null &amp; demo != ''">
-                AND `demo` like CONCAT('%', #{demo}, '%')
+                AND `demo` LIKE CONCAT('%', #{demo}, '%')
             </if>
             <if test="startTime != null and createDate != ''">
                 AND date_format(`createDate`, '%Y-%m-%d %H:%i:%S') >= #{startTime}
@@ -91,7 +91,7 @@
             </if>
             AND `status` > -1
         </where>
-        order by `createDate` desc
+        ORDER BY `createDate` DESC
     </select>
 
 

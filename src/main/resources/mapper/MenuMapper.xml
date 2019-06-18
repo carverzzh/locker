@@ -75,7 +75,7 @@
     </insert>
 
     <update id="updateEntity" parameterType="com.bugull.locker.entity.MenuEntity">
-        update `sys_menu`
+        UPDATE `sys_menu`
         <set>
             <if test="menuName != null &amp; menuName != '' ">
                 `menuName` = #{menuName,jdbcType=VARCHAR},
@@ -99,21 +99,21 @@
             `modifyDate` = NOW(),
             `version` = `version` + 1
         </set>
-        where `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
+        WHERE `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
     </update>
 
     <select id="selectPageByMap" resultMap="BaseResultMap" >
-        select <include refid="Base_Column_List"/> from `sys_menu`
+        SELECT <include refid="Base_Column_List"/> FROM `sys_menu`
         <where>
-            `status` > -1 and `level` > 0
+            `status` > -1 AND `level` > 0
             <if test="menuName != null and menuName != ''">
-                and `menuName` = #{menuName}
+                AND `menuName` = #{menuName}
             </if>
             <if test="menuCode != null and menuCode != ''">
-                and `menuCode` = #{menuCode}
+                AND `menuCode` = #{menuCode}
             </if>
         </where>
-        order by `createDate` desc
+        ORDER BY `createDate` DESC
     </select>
 
     <update id="deleteByUser" parameterType="java.lang.String">
@@ -123,25 +123,33 @@
     </update>
 
     <select id="checkMenuExist" resultType="java.lang.Integer">
-        select 1 from `sys_menu`
+        SELECT 1 FROM `sys_menu`
         <where>
             `status` > -1
             <if test="menuName != null and menuName != ''">
-                and `menuName` = #{menuName}
+                AND `menuName` = #{menuName}
             </if>
             <if test="menuCode != null and menuCode != ''">
-                and `menuCode` = #{menuCode}
+                AND `menuCode` = #{menuCode}
             </if>
         </where>
-        limit 1
+        LIMIT 1
     </select>
 
     <select id="getMenuFunTree" resultMap="MenuFuncTreeResultMap" >
-        select menu.`id` as menuId, menu.`menuName` as menuName, menu.`menuUrl` as menuUrl, menu.`parentId` as parentId, menu.`level` as level, menu.`sequence` as sequence,
-        fun.`menuId` as func_menu_id, fun.`id` as funId, fun.`functionName` as funName, fun.`functionUrl` as funUrl
-        from sys_menu menu
-        LEFT JOIN sys_function fun on (menu.`id` = fun.`menuId` and fun.`status` = 1)
-        where menu.`status` = 1 and menu.`level` > 0
+        SELECT menu.`id` AS menuId, menu.`menuName` AS menuName, menu.`menuUrl` AS menuUrl, menu.`parentId` AS parentId, menu.`level` AS level, menu.`sequence` AS sequence,
+        fun.`menuId` AS func_menu_id, fun.`id` AS funId, fun.`functionName` AS funName, fun.`functionUrl` AS funUrl
+        FROM sys_menu menu
+        LEFT JOIN sys_function fun ON (menu.`id` = fun.`menuId` AND fun.`status` = 1)
+        WHERE menu.`status` = 1 AND menu.`level` > 0
+    </select>
+
+    <select id="getMenuById" resultMap="MenuFuncTreeResultMap" >
+        SELECT menu.`id` AS menuId, menu.`menuName` AS menuName, menu.`menuUrl` AS menuUrl, menu.`parentId` AS parentId, menu.`level` AS level, menu.`sequence` AS sequence,
+        fun.`menuId` AS func_menu_id, fun.`id` AS funId, fun.`functionName` AS funName, fun.`functionUrl` AS funUrl
+        FROM sys_menu menu
+        LEFT JOIN sys_function fun ON (menu.`id` = fun.`menuId` AND fun.`status` = 1)
+        WHERE menu.`status` = 1 AND menu.`level` > 0 AND menu.`id` = #{id}
     </select>
 
 

@@ -12,4 +12,6 @@ public interface MenuMapper extends BaseMapper {
     public Integer checkMenuExist(@Param("menuName") String menuName, @Param("menuCode") String menuCode);
 
     public List<MenuFunctionTreeVO> getMenuFunTree();
+
+    public MenuFunctionTreeVO getMenuById(@Param("id") String id);
 }

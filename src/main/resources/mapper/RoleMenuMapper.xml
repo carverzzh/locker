@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bugull.locker.mapper.RoleMenuMapper">
+    <resultMap id="BaseResultMap" type="com.bugull.locker.entity.RoleMenuEntity">
+        <id property="id" javaType="string" column="id" />
+        <result column="menuId" jdbcType="VARCHAR" property="menuId" />
+        <result column="roleId" jdbcType="VARCHAR" property="roleId" />
+    </resultMap>
+
+    <sql id = "Base_Column_list">
+        `id`, `menuId`, `roleId`
+    </sql>
+
+    <insert id = "insert" parameterType="com.bugull.locker.entity.UserRoleEntity">
+        INSERT INTO `sys_rolemenu` (`id`, `menuId`, `roleId`)
+        VALUES
+        (#{id,jdbcType=VARCHAR}, #{menuId,jdbcType=VARCHAR}, #{roleId,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="delete" parameterType="string">
+        DELETE FROM `sys_rolemenu` WHERE `userId` = #{roleId,jdbcType=VARCHAR}
+    </delete>
+
+    <select id="selectByRole" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_list"/>
+        FROM `sys_rolemenu` WHERE  `roleId` = #{roleId}
+    </select>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_list"/>
+        FROM `sys_rolemenu` WHERE  `id` = #{id}
+    </select>
+
+</mapper>

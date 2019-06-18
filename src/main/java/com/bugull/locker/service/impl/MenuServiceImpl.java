@@ -46,4 +46,9 @@ public class MenuServiceImpl extends BaseServiceImpl implements MenuService{
     public List<MenuFunctionTreeVO> getMenuFunTree() {
         return menuDao.getMenuFunTree();
     }
+
+    @Override
+    public MenuFunctionTreeVO getMenuById(String id) {
+        return menuDao.getMenuById(id);
+    }
 }

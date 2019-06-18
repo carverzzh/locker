@@ -17,6 +17,28 @@
         <result column="status" jdbcType="INTEGER" property="status"/>
         <result column="version" jdbcType="INTEGER" property="version"/>
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
+
+        <result column="roleId" jdbcType="VARCHAR" property="roleId" />
+    </resultMap>
+
+    <resultMap id="UserVOResultMap" type="com.bugull.locker.vo.UserVO">
+        <id property="id" javaType="string" column="id" />
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="password" jdbcType="VARCHAR" property="password" />
+        <result column="userAlias" jdbcType="VARCHAR" property="userAlias" />
+        <result column="phone" jdbcType="VARCHAR" property="phone" />
+        <result column="email" jdbcType="VARCHAR" property="email" />
+        <result column="parentId" jdbcType="VARCHAR" property="parentId" />
+        <result column="createUser" jdbcType="VARCHAR" property="createUser"/>
+        <result column="createDate" jdbcType="DATE" property="createDate" javaType="java.sql.Timestamp"/>
+        <result column="modifyUser" jdbcType="VARCHAR" property="modifyUser"/>
+        <result column="modifyDate" jdbcType="DATE" property="modifyDate" javaType="java.sql.Timestamp"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+
+        <result column="roleName" jdbcType="VARCHAR" property="roleName" />
+        <result column="roleCode" jdbcType="VARCHAR" property="roleCode" />
     </resultMap>
 
     <sql id = "Base_Column_List">
@@ -24,89 +46,99 @@
          `createUser`, `createDate`, `modifyUser`, `modifyDate`, `status`, `version`, `remark`
     </sql>
 
-    <select id="queryUserList" parameterType="java.util.Map" resultType="java.lang.String">
-        select <include refid="Base_Column_List"/> from `sys_user`
-        <where>
-            `status` > -1 and `parentId` = #{parentId}
-            <if test="username != null and username != ''">
-                and `username` like CONCAT('%', #{username}, '%')
-            </if>
-            <if test="userAlias != null and userAlias != ''">
-                and `userAlias` like CONCAT('%', #{userAlias}, '%')
-            </if>
-        </where>
-    </select>
-
     <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM sys_demo WHERE  `id` = #{id} and `status` > -1
+        SELECT u.`id`, u.`username`, u.`password`, u.`userAlias`, u.`phone`, u.`email`, u.`parentId`,
+        u.`createUser`, u.`createDate`, u.`modifyUser`, u.`modifyDate`, u.`status`, u.`version`, u.`remark`, sr.roleId
+        FROM `sys_user` u
+        LEFT JOIN `sys_userrole` sr ON (sr.`userId` = u.`id`)
+        WHERE  u.`id` = #{id} AND u.`status` > -1
     </select>
 
     <select id="selectByIds" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM sys_demo WHERE `status` >= -1 AND `id` IN
+        FROM `sys_user` WHERE `status` >= -1 AND `id` IN
         <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
             #{id}
         </foreach>
     </select>
 
     <update id="deleteById" parameterType="java.lang.String">
-        UPDATE sys_demo SET `status` = -1, `version` = `version` + 1 WHERE `id` = #{id}
+        UPDATE `sys_user` SET `status` = -1, `version` = `version` + 1 WHERE `id` = #{id}
     </update>
 
     <update id="deleteByIds">
-        UPDATE sys_demo SET `status` = -1, `version` = `version` + 1 WHERE `id` IN
+        UPDATE `sys_user` SET `status` = -1, `version` = `version` + 1 WHERE `id` IN
         <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
             #{id}
         </foreach>
     </update>
 
     <insert id="insertEntity" parameterType="com.bugull.locker.entity.Demo">
-        INSERT INTO sys_demo (`id`, `demo`, `createUser`, `createDate`, `modifyUser`,
-        `modifyDate`, `status`, `version`, `remark`
+        INSERT INTO `sys_user` (`id`, `username`, `password`, `userAlias`, `phone`, `email`, `parentId`,
+         `createUser`, `createDate`, `modifyUser`, `modifyDate`, `status`, `version`, `remark`
         )
         VALUES
-        (#{id,jdbcType=VARCHAR}, #{demo,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, NOW(),
-        #{modifyUser,jdbcType=VARCHAR}, NOW(), 1, 1, #{remark,jdbcType=VARCHAR})
+        (#{id,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{userAlias,jdbcType=VARCHAR},
+        #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{parentId,jdbcType=VARCHAR},
+        #{createUser,jdbcType=VARCHAR}, NOW(), #{modifyUser,jdbcType=VARCHAR}, NOW(), 1, 1, #{remark,jdbcType=VARCHAR})
     </insert>
 
     <update id="updateEntity" parameterType="com.bugull.locker.entity.Demo">
-        update sys_demo
+        update `sys_user`
         <set>
-            <if test="demo != null &amp; demo != '' ">
-                `demo` = #{demo,jdbcType=VARCHAR},
+            <if test="userAlias != null &amp; userAlias != '' ">
+                `userAlias` = #{userAlias,jdbcType=VARCHAR},
             </if>
-            <if test="modifyUser != null &amp; modifyUser != '' ">
-                `modifyUser` = #{modifyUser,jdbcType=VARCHAR},
+            <if test="phone != null &amp; phone != '' ">
+                `phone` = #{phone,jdbcType=VARCHAR},
             </if>
-            <if test="remark != null &amp; remark != '' ">
-                `remark` = #{remark,jdbcType=VARCHAR},
+            <if test="email != null &amp; email != '' ">
+                `email` = #{email,jdbcType=VARCHAR},
             </if>
+            `modifyUser` = #{modifyUser,jdbcType=VARCHAR},
             `modifyDate` = NOW(),
             `version` = `version` + 1
         </set>
-        where `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
+        WHERE `id` = #{id,jdbcType=VARCHAR} AND `version` = #{version,jdbcType=INTEGER}
     </update>
 
-    <select id="selectPageByMap" resultMap="BaseResultMap" >
-        SELECT <include refid="Base_Column_List"/>
-        FROM sys_demo
+    <select id="selectPageByMap" resultMap="UserVOResultMap" >
+        SELECT u.`id`, u.`username`, u.`password`, u.`userAlias`, u.`phone`, u.`email`, u.`parentId`,
+        u.`createUser`, u.`createDate`, u.`modifyUser`, u.`modifyDate`, u.`status`, u.`version`, u.`remark`,
+        r.`roleName`, r.`roleCode`
+        FROM `sys_user` u
+        LEFT JOIN `sys_userrole` ur ON (ur.`userId` = u.`id`)
+        LEFT JOIN `sys_role` r ON (r.`id` = ur.`roleId` AND r.`status` > -1)
         <where>
-            <if test="demo != null &amp; demo != ''">
-                AND `demo` like CONCAT('%', #{demo}, '%')
+            <if test="userAlias != null &amp; userAlias != ''">
+                AND u.`userAlias` LIKE CONCAT('%', #{userAlias}, '%')
             </if>
-            <if test="startTime != null and createDate != ''">
-                AND date_format(`createDate`, '%Y-%m-%d %H:%i:%S') >= #{startTime}
+            <if test="phone != null &amp; phone != ''">
+                AND u.`phone` = #{phone,jdbcType=VARCHAR},
             </if>
-            <if test="endTime != null and endTime != ''">
-                AND date_format(`createDate`, '%Y-%m-%d %H:%i:%S') <![CDATA[ <=  ]]> concat(#{endTime}, 'z')
+            <if test="email != null &amp; email != ''">
+                AND u.`email` = #{email,jdbcType=VARCHAR}
             </if>
-            AND `status` > -1
+            <if test="roleName != null &amp; roleName != ''">
+                AND r.`roleName` = #{roleName,jdbcType=VARCHAR}
+            </if>
+            AND u.`status` > -1
         </where>
-        order by `createDate` desc
+        ORDER BY u.`createDate` DESC
     </select>
+
+    <select id="checkUsernameExist" resultType="java.lang.Integer">
+        SELECT 1 FROM `sys_user`
+        WHERE `status` > -1 AND `userName` = #{userName}
+        LIMIT 1
+    </select>
+
+    <update id="deleteByUser" parameterType="java.lang.String">
+        UPDATE `sys_user` SET `status` = -1, `version` = `version` + 1
+        `modifyUser` = #{userId}, `modifyDate` = NOW()
+        WHERE `id` = #{id}
+    </update>
 
 
 </mapper>

@@ -52,4 +52,10 @@ public class MenuDaoImpl extends BaseDAOImpl implements MenuDao{
         MenuMapper map = (MenuMapper) sqlSession.getMapper(getMapperClass());
         return map.getMenuFunTree();
     }
+
+    @Override
+    public MenuFunctionTreeVO getMenuById(String id) {
+        MenuMapper map = (MenuMapper) sqlSession.getMapper(getMapperClass());
+        return map.getMenuById(id);
+    }
 }

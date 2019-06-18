@@ -83,7 +83,7 @@ public class FunctionController {
         return ApiResult.success(functionService.updateEntity(function));
     }
 
-    @ApiOperation(value = "checkMenu", notes = "功能查重")
+    @ApiOperation(value = "checkFactory", notes = "功能查重")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "functionName", value = "功能名称", required = false, paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "functionCode", value = "功能编码", required = false, paramType = "query", dataType = "String"),

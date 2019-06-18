@@ -24,4 +24,6 @@ public class UserEntity extends BaseEntity {
     private String email;
 
     private String parentId;
+
+    private String roleId;
 }

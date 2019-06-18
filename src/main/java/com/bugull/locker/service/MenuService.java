@@ -12,4 +12,6 @@ public interface MenuService extends BaseService {
     public boolean checkMenuExist(String menuName, String menuCode);
 
     public List<MenuFunctionTreeVO> getMenuFunTree();
+
+    public MenuFunctionTreeVO getMenuById(String id);
 }
