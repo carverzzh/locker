@@ -13,4 +13,6 @@ public interface RoleService extends BaseService {
     public BaseEntity insert(RoleEntity entity);
 
     public RoleEntity detail(String id);
+
+    public RoleEntity update(RoleEntity entity);
 }

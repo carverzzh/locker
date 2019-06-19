@@ -60,18 +60,7 @@ public class RoleServiceImpl extends BaseServiceImpl implements RoleService{
     public BaseEntity insert(RoleEntity entity) {
         BaseEntity result = roleDao.insertEntity(entity);
         List<RoleMenuEntity> roleMenuList = entity.getRoleMenuList();
-        for (RoleMenuEntity roleMenu : roleMenuList) {
-            roleMenu.setRoleId(result.getId());
-            roleMenuDao.insert(roleMenu);
-            List<RoleFunctionEntity> roleFunctionList = roleMenu.getRoleFunctionList();
-            for (RoleFunctionEntity roleFunction : roleFunctionList) {
-                roleFunction.setId(UUID.randomUUID().toString().replace("-", ""));
-                roleFunction.setRoleMenuId(roleMenu.getId());
-            }
-            if (roleFunctionList.size() > 0) {
-                roleFunctionDao.insertBatch(roleFunctionList);
-            }
-        }
+        handleRoleMenuFunction(roleMenuList, result.getId());
         return roleDao.insertEntity(entity);
     }
 
@@ -84,5 +73,29 @@ public class RoleServiceImpl extends BaseServiceImpl implements RoleService{
             roleMenu.setRoleFunctionList(list);
         }
         return role;
+    }
+
+    @Override
+    public RoleEntity update(RoleEntity entity) {
+        roleFunctionDao.delete(entity.getId());
+        roleMenuDao.delete(entity.getId());
+        List<RoleMenuEntity> roleMenuList = entity.getRoleMenuList();
+        handleRoleMenuFunction(roleMenuList, entity.getId());
+        return (RoleEntity) roleDao.updateEntity(entity);
+    }
+
+    private void handleRoleMenuFunction(List<RoleMenuEntity> roleMenuList, String roleId) {
+        for (RoleMenuEntity roleMenu : roleMenuList) {
+            roleMenu.setRoleId(roleId);
+            roleMenuDao.insert(roleMenu);
+            List<RoleFunctionEntity> roleFunctionList = roleMenu.getRoleFunctionList();
+            for (RoleFunctionEntity roleFunction : roleFunctionList) {
+                roleFunction.setId(UUID.randomUUID().toString().replace("-", ""));
+                roleFunction.setRoleMenuId(roleMenu.getId());
+            }
+            if (roleFunctionList.size() > 0) {
+                roleFunctionDao.insertBatch(roleFunctionList);
+            }
+        }
     }
 }
